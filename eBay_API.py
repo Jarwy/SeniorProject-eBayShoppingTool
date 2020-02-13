@@ -8,13 +8,29 @@ Created on Thu Feb 13 04:35:01 2020
 from ebaysdk.finding import Connection as finding;
 from bs4 import BeautifulSoup;
 import pandas as pd;
+import time;
 
 
-Keywords = input("Search:");
-api = finding(appid ='ChiaWeiH-20200213-PRD-fca7fae46-eb3bd471', debug=True, config_file = None);
-api_request = {"keywords":Keywords, "outputSelector":"SellerInfo"};
+Keywords = "ssd 128gb";
+api = finding(appid ='ChiaWeiH-20200213-PRD-fca7fae46-eb3bd471'
+#              ,domain='svcs.sandbox.ebay.com'
+              ,debug=True
+              ,config_file= None
+             );
+              
 
-response = api.execute('findItemsByKeywords', api_request)
+
+api_request = {"keywords":Keywords
+               ,"outputSelector":"SellerInfo"
+               , 'paginationInput': {'entriesPerPage': 25,'pageNumber': 1 }
+              };
+  
+
+
+
+#response = api.execute('findItemsAdvanced', api_request)
+response = api.execute('findCompletedItems', api_request);
+time.sleep(5);
 soup = BeautifulSoup(response.content, "lxml");
 
 totalentries = int(soup.find("totalentries").text);
@@ -28,6 +44,7 @@ TitleList = [];
 PriceList = [];
 SiteList = [];
 SellerList = [];
+#ShippingInfoList = [];
 
 
 for item in items:
@@ -46,14 +63,8 @@ for item in items:
     seller = item.sellerusername.string.lower();
     SellerList.append(seller);
 
-X = totalentries;
-if(X >=100):
-    boundery = 100;
-else:
-    boundery = totalentries;
-
 # 
-for i in range(0,boundery):
+for i in range(0,4):
     print("____________________________________________________________________________________________________________________________");
     print(DateList[i],"\n");
     print(IDList[i],"\n");
@@ -64,6 +75,6 @@ for i in range(0,boundery):
     print(SiteList[i],"\n");
     
 
-FullList = [DateList,IDList,CatList,TitleList,PriceList,SellerList, SiteList]
+FullList = [DateList,IDList,CatList,TitleList,PriceList,SellerList, SiteList];
     
-df = pd.DataFrame(zip(*FullList), columns=['Date','ID','Catrgory', 'Item Name', 'Price', 'Seller', 'Site']); 
+df = pd.DataFrame(zip(*FullList), columns=['Date','ID','Catrgory', 'Item Name', 'Price', 'Seller', 'Site']);  
