@@ -5,13 +5,18 @@ Created on Thu Feb 13 04:35:01 2020
 @author: Jarwy
 """
 
-from ebaysdk.finding import Connection as finding;
-from bs4 import BeautifulSoup;
-import pandas as pd;
 import time;
+import pymongo;
+import pandas as pd;
+from bs4 import BeautifulSoup;
+from ebaysdk.finding import Connection as finding;
+
+
+
 
 
 Keywords = "ssd 128gb";
+entriesPerPage = 25
 api = finding(appid ='ChiaWeiH-20200213-PRD-fca7fae46-eb3bd471'
 #              ,domain='svcs.sandbox.ebay.com'
               ,debug=True
@@ -22,7 +27,7 @@ api = finding(appid ='ChiaWeiH-20200213-PRD-fca7fae46-eb3bd471'
 
 api_request = {"keywords":Keywords
                ,"outputSelector":"SellerInfo"
-               , 'paginationInput': {'entriesPerPage': 25,'pageNumber': 1 }
+               , 'paginationInput': {'entriesPerPage': entriesPerPage,'pageNumber': 1 }
               };
   
 
@@ -78,3 +83,18 @@ for i in range(0,4):
 FullList = [DateList,IDList,CatList,TitleList,PriceList,SellerList, SiteList];
     
 df = pd.DataFrame(zip(*FullList), columns=['Date','ID','Catrgory', 'Item Name', 'Price', 'Seller', 'Site']);  
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/");
+mydb = myclient["Ebay"];
+mycol = mydb[Keywords];
+
+for i in range(0,entriesPerPage-1):
+    
+#    print(CatList[i],"\n");
+#    print(TitleList[i],"\n");
+#    print(PriceList[i],"\n");
+#    print(SellerList[i],"\n");
+#    print(SiteList[i],"\n"); 
+    INFO = { "Category": CatList[i], "Product Name": TitleList[i], "Price": PriceList[i], "Seller": SellerList[i], "Site": SiteList[i]}
+    x = mycol.insert_one(INFO) 
+    print(x)
