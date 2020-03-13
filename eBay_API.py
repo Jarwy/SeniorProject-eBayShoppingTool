@@ -99,20 +99,36 @@ while (True):
         # =============================================================================
         # <Connect with MongoDB>
         # =============================================================================
+        count = 0;
         myclient = pymongo.MongoClient("mongodb://localhost:27017/");
         mydb = myclient["Ebay"];
         mycol = mydb[Keywords];
-
-        for i in range(0,entriesPerPage-1):
-    
-#           print(CatList[i],"\n");
-#           print(TitleList[i],"\n");
-#           print(PriceList[i],"\n");
-#           print(SellerList[i],"\n");
-#           print(SiteList[i],"\n"); 
-            INFO = { "Category": CatList[i], "Product Name": TitleList[i], "Price": PriceList[i], "Seller": SellerList[i], "Site": SiteList[i]}
-            x = mycol.insert_one(INFO) 
-            print(x)
+        print("________________________________________________________________");
+        print(datetime.datetime.now());
+        for i in range(0,boundery):
+        #    print("____________________________________________________________________________________________________________________________");
+        #    print(IDList[i],"\n");
+        #    print(CatList[i],"\n");
+        #    print(TitleList[i],"\n");
+        #    print(PriceList[i],"\n");
+        #    print(SellerList[i],"\n");
+        #    print(SiteList[i],"\n"); 
+            myquery = { "ID": IDList[i]};
+            search = mycol.find(myquery)
+            results = [x for x in search] #Decomposite List
+        #    results_id = results[i]["ID"]
+#        print(datetime.datetime.now());
+            if(results==[]):
+                print(i, "Not exist, Inserted!", datetime.datetime.now());
+                INFO = { "ID":IDList[i], "Category": CatList[i], "Product Name": TitleList[i], "Price": PriceList[i], "Seller": SellerList[i], "Site": SiteList[i]}
+                x = mycol.insert_one(INFO) 
+                count = count+1;
+        
+        if(count==0):
+            print("There is no new product!")
+        else:
+            print(count, "new product(s) was inserted.")
+        print("________________________________________________________________");
         # =============================================================================
         # <Build Dataframe>
         # =============================================================================
@@ -128,5 +144,3 @@ while (True):
            
             sched_timer = sched_timer + datetime.timedelta(seconds=30)
             flag = 0
-
-
