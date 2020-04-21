@@ -32,7 +32,7 @@ def Requset(keywords, entriesPerPage, pageNumber):
 
 def Execute(API, mode, request):
     Response = API.execute(mode, request);
-    time.sleep(30);
+    time.sleep(10);
     return Response;
 
 def Beautify(response):
@@ -44,7 +44,7 @@ def Beautify(response):
 
 def Formate(items):
     for item in items:
-        date = item.starttime.string.lower();
+        date = item.endtime.string.lower();
         formateDate = re.sub(r"t"," ",date);
         formateDate = re.sub(r"z","",formateDate);
         formateDate = datetime.datetime.strptime(formateDate, '%Y-%m-%d %H:%M:%S.%f');
@@ -80,27 +80,71 @@ def Formate(items):
         else:
             DL.StateEncodeList.append("2");
             
-def DataBase(client, DB, keywords, boundary):
+def DataBase(client, DB, keywords, boundary, EndDate):
     count = 0;
-    myclient = pymongo.MongoClient(client);
-    mydb = myclient[DB];
-    mycol = mydb[keywords];
     print("________________________________________________________________");
     print(datetime.datetime.now());
     for i in range(0,boundary):
-        myquery = { "ID": DL.IDList[i]};
-        search = mycol.find(myquery)
-        results = [x for x in search] #Decomposite List
-        if(results==[]):
-            print(i, "Not exist, Inserted!", datetime.datetime.now());
-            INFO = { "Date":DL.DateList[i], "Price": DL.PriceList[i], "Product": DL.TitleList[i]
-                    ,"Source": "Ebay", "Site": DL.SiteList[i], "ID":DL.IDList[i]
-                    , "Selling Status":DL.StateEncodeList[i]}
-            mycol.insert_one(INFO) 
-            count = count+1;
+        Title = DL.TitleList[i];
+        if (not ('lot' in Title or 'Lot' in Title)):
+#            Y = DL.DateList[i].year;
+#            M = DL.DateList[i].month;
+            YM = str(DL.DateList[i])[0:7];
+            if(not (YM in EndDate)):
+                EndDate.append(YM);
+            myclient = pymongo.MongoClient(client);
+            x = "eBay_"+keywords.replace(' ', '_');
+            y = YM+"_End";
+            mycol = myclient[x][y];
+            myquery = { "ID": DL.IDList[i]};
+            search = mycol.find(myquery)
+            results = [x for x in search] #Decomposite List
+            if(results==[]):
+                print(i, "Not exist, Inserted!", datetime.datetime.now());
+                INFO = { "Date":DL.DateList[i], "Price": DL.PriceList[i], "Product": DL.TitleList[i]
+                        ,"Source": "eBay", "Site": DL.SiteList[i], "ID":DL.IDList[i]
+                        , "Selling Status":DL.StateEncodeList[i]}
+                mycol.insert_one(INFO) 
+                count = count+1;
     if(count==0):
         print("There is no new product!")
     else:
         print(count, "new product(s) was inserted.")
         print("________________________________________________________________");
+        
+def MonthAverage(client, collection, keywords):#collection 2018-10
+    totalPrice_1 = 0;
+    totalPrice_2 = 0;
+    myclient = pymongo.MongoClient(client);
+    mycol = myclient["eBay_"+keywords.replace(' ', '_')][collection+"_End"];
+    myquery_1 = { "Selling Status": "1"};
+    myquery_2 = { "Selling Status": "2"};
+    result_1 = list(mycol.find(myquery_1));
+    result_2 = list(mycol.find(myquery_2));
+    for i in result_1:
+        totalPrice_1 = totalPrice_1+i["Price"];
+    AveragePrice_1 = totalPrice_1/len(result_1);
+    for i in result_2:
+        totalPrice_2 = totalPrice_2+i["Price"];
+    AveragePrice_2 = totalPrice_2/len(result_2);
+    ############################################################################################
+    mycol = myclient["eBay_"+keywords.replace(' ', '_')][collection[0:4]+" History Price"]; #2018 History Price
+    myquery_1 = {"EndedDate": collection};
+    myquery_2 = {"EndedDate": collection};
+    search_1 = mycol.find(myquery_1);
+    search_2 = mycol.find(myquery_2);
+    results_1 = [x for x in search_1];
+    results_2 = [x for x in search_2];
+    if(results_1==[]):
+        INFO = {"EndedDate": collection, "Average Price": AveragePrice_1, "Selling Status": "1"}
+        mycol.insert_one(INFO);
+    else:
+        newvalues = {"$set": { "Average Price": AveragePrice_1}}
+        mycol.update_one(myquery_1, newvalues);
     
+    if(results_2==[]):
+        INFO = {"EndedDate": collection, "Average Price": AveragePrice_2, "Selling Status": "2"}
+        mycol.insert_one(INFO);
+    else:
+        newvalues = {"$set": { "Average Price": AveragePrice_2}}
+        mycol.update_one(myquery_2, newvalues);
