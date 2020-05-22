@@ -1,3 +1,6 @@
+Mon Apr 6 2020 04:05:21
+  -Add one file "eBay_API_DatabaseCombine.py".
+
 Fri Mar 13 2020 09:07:41
   -Fix bugs: Avoid to insert same product into database. 
 
