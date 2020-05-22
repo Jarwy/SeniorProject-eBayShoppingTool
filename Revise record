@@ -1,17 +1,17 @@
-Thu Jan 30 2020 23:31:32
-  -Parsed the whole web page to collect product details.
-  
-Tue Feb 11 2020 16:40:21
-  -Collecting product details by eBay API.
-  
-Thu Feb 13 2020 16:35:01
-  -Add pagination in request.
-  
-Mon Feb 17 2020 12:19:45
-  -Push the data into MongoDB.
-  
-Wed Feb 26 2020 17:43:08
-  -Use while loop to extract product details.
-  
 Fri Mar 13 2020 09:07:41
   -Fix bugs: Avoid to insert same product into database. 
+
+Wed Feb 26 2020 17:43:08
+  -Use while loop to extract product details.
+
+Mon Feb 17 2020 12:19:45
+  -Push the data into MongoDB.
+
+Thu Feb 13 2020 16:35:01
+  -Add pagination in request.
+
+Tue Feb 11 2020 16:40:21
+  -Collecting product details by eBay API.
+
+Thu Jan 30 2020 23:31:32
+  -Parsed the whole web page to collect product details.
