@@ -1,7 +1,7 @@
 The Apr 21 2020 05:11:25
-	-Add date classification function: Classify the product data by their date and push them into corresponding collection of database.
-	-Add selling status classification function: Classify the product data by different selling status. 
-	-Add average price counting function: Count the monthly average price.
+	-Add date classification function.
+	-Add selling status classification function.
+	-Add average price counting function.
 
 
 Wed Apr 15 2020 04:31:04
