@@ -11,7 +11,7 @@ Thu Feb 13 2020 16:35:01
   -Add pagination in request.
 
 Tue Feb 11 2020 16:40:21
-  -Collecting product details by eBay API.
+  -eBay_API.py: Collecting product details by eBay API.
 
 Thu Jan 30 2020 23:31:32
-  -Parsed the whole web page to collect product details.
+  -eBay_parser.py: Parsed the whole web page to collect product details.
