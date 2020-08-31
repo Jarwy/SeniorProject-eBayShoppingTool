@@ -1,7 +1,7 @@
 The Apr 21 2020 05:11:25
-	-Add date classification function.
-	-Add selling status classification function.
-	-Add average price counting function.
+	  -Add date classification function.
+	  -Add selling status classification function.
+	  -Add average price counting function.
 
 
 Wed Apr 15 2020 04:31:04
